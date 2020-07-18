@@ -81,7 +81,6 @@ class Board{
 }
 let board = new Board();
 board.draw();
-board.random()
 canvas.onmousemove = function(e){
     board.draw(Math.floor(e.x/scl),Math.floor(e.y/scl));
     if (!board.currentPiece.isNull()){
