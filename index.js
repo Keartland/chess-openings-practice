@@ -1,6 +1,6 @@
 var c = document.getElementById("canvas");
 var ctx = c.getContext("2d");
-ctx.font = "30px Arial";
+ctx.font = "bold 50px Arial";
 ctx.textBaseline = "middle"; 
 ctx.textAlign = "center";
 const scl = c.width/8
@@ -10,9 +10,13 @@ class Piece{
         this.name=name;
         this.colour=colour;
     }
+    isNull(){
+        return this.name=="";
+    }
     draw(x,y){
-        ctx.fillStyle = this.colour == "b"?"black":"white";
-        ctx.fillText(this.name, (x+0.5)*scl,(y+0.5)*scl); 
+        this.img = new Image(scl/2,scl/2);
+        this.img.src = "http://images.chesscomfiles.com/chess-themes/pieces/neo/150/"+this.colour+this.name+".png"
+        ctx.drawImage(this.img, x-0.5*scl,y-0.5*scl,scl,scl);
     }
 }
 
@@ -43,24 +47,57 @@ class Board{
         this.b[0][4] = new Piece("k","b");
         this.b[7][4] = new Piece("k","w");
         console.log(this.b)
+        this.currentPiece = new Piece("","");
     }
+    clicked(x,y){
+        if (this.currentPiece.isNull()){
+            this.currentPiece = this.b[y][x]
+            this.b[y][x] = new Piece("","");
+        } else{
+            this.b[y][x] = this.currentPiece
+            this.currentPiece = new Piece("","");
+        }
+        this.draw(x,y)
+    }
+
     draw(x,y){
         for(let i=0;i<this.b.length;i++){
             for(let j=0;j<this.b.length;j++){
-
                 ctx.fillStyle = (i+j)%2 == 1 ?"#c19875":"#f2e3bc" ;
                 if(x==j && y==i){ ctx.fillStyle = "red"}
                 ctx.fillRect(j*scl, i*scl, scl, scl); 
-                this.b[i][j].draw(j,i);
+                this.b[i][j].draw((j+0.5)*scl,(i+0.5)*scl);
             }
         }
     }
+
+    flip(){
+        this.b.reverse();
+        for (let i=0; i<this.b.length;i++) {
+            this.b[i].reverse();
+        }
+        this.draw()
+    }
 }
-canvas.onmousemove = function(e){
-    board.draw(Math.floor(e.x/scl),Math.floor(e.y/scl));
-};
 let board = new Board();
 board.draw();
-canvas.onclick = function(e){
-    console.log(board.b[Math.floor(e.y/scl)][Math.floor(e.x/scl)])
+board.random()
+canvas.onmousemove = function(e){
+    board.draw(Math.floor(e.x/scl),Math.floor(e.y/scl));
+    if (!board.currentPiece.isNull()){
+        board.currentPiece.draw(e.x,e.y);
+    }
+};
+canvas.onmousedown = function(e){
+    board.clicked(Math.floor(e.x/scl),Math.floor(e.y/scl))
+    board.currentPiece.draw(e.x,e.y);
+};
+canvas.onmouseup = function(e){
+    board.clicked(Math.floor(e.x/scl),Math.floor(e.y/scl))
+    board.currentPiece.draw(e.x,e.y);
+};
+
+canvas.oncontextmenu = function(e){
+    e.preventDefault();
+    board.flip();
 };
