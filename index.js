@@ -88,15 +88,25 @@ canvas.onmousemove = function(e){
     }
 };
 canvas.onmousedown = function(e){
+    if (e.button == 2) return;
     board.clicked(Math.floor(e.x/scl),Math.floor(e.y/scl))
     board.currentPiece.draw(e.x,e.y);
 };
 canvas.onmouseup = function(e){
+    if (e.button == 2) return;
     board.clicked(Math.floor(e.x/scl),Math.floor(e.y/scl))
     board.currentPiece.draw(e.x,e.y);
 };
-
 canvas.oncontextmenu = function(e){
     e.preventDefault();
     board.flip();
+};
+document.onkeydown = function(e){
+    if (e.key == 'l'){
+        console.log(board.b)
+    }
+    if (e.key == 'r'){
+        board = new Board();
+        board.draw();
+    }
 };
